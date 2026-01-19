@@ -1,0 +1,51 @@
+<div id="appointments"></div>
+
+<script>
+const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcXztfhCUIK4ju9zk4wMrLhEdkj72R0PGfnlsGDfbJ29BgC9fuQVmtoqt0eHo7Jk5nVjNzmKZe6M4H/pub?output=csv";
+
+fetch(sheetURL)
+  .then(response => response.text())
+  .then(csv => {
+    const rows = csv.split("\n").slice(1); // Skip the header row
+    const container = document.getElementById("appointments");
+
+    rows.forEach(row => {
+      if (!row.trim()) return; // Skip empty rows
+
+      const cols = row.split(",");
+
+      // Adjust indexes to match your CSV columns
+      const name = cols[1];      // Customer name
+      const phone = cols[2];     // Phone number
+      const hairstyle = cols[3]; // Hairstyle text
+      const imageURL = cols[4];  // Optional: image link
+      const time = cols[5];      // Scheduled time
+
+      const card = document.createElement("div");
+      card.style.border = "1px solid #ccc";
+      card.style.padding = "12px";
+      card.style.marginBottom = "10px";
+      card.style.borderRadius = "8px";
+      card.style.background = "#f9f9f9";
+
+      card.innerHTML = `
+        <strong>${name}</strong><br>
+        📞 ${phone}<br>
+        💈 Hairstyle: ${hairstyle}<br>
+        ${imageURL ? `<img src="${imageURL}" alt="Hairstyle" style="max-width:100px; display:block; margin:5px 0;">` : ''}
+        ⏰ ${time}<br><br>
+        <button class="complete">Complete</button>
+        <button class="pending">Pending</button>
+        <button class="cancel">Cancel</button>
+      `;
+
+      // Status buttons
+      card.querySelector(".complete").onclick = () => { card.style.background = "#d1fae5"; };
+      card.querySelector(".pending").onclick = () => { card.style.background = "#fef3c7"; };
+      card.querySelector(".cancel").onclick = () => { card.style.background = "#fee2e2"; };
+
+      container.appendChild(card);
+    });
+  })
+  .catch(err => console.error("Error fetching CSV:", err));
+</script>
