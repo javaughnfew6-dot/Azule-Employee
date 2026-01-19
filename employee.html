@@ -1,51 +1,98 @@
-<div id="appointments"></div>
+!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employee Dashboard - AZULE</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f4f6;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #1e40af;
+    }
+    #appointments {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .card {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 12px;
+      background: #fff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .card img {
+      max-width: 100%;
+      border-radius: 6px;
+      margin-top: 8px;
+    }
+    .card button {
+      margin-right: 5px;
+      margin-top: 8px;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      color: #fff;
+    }
+    .complete { background: #22c55e; }
+    .pending { background: #fbbf24; }
+    .cancel { background: #ef4444; }
+  </style>
+</head>
+<body>
+  <h1>A-ZULE Employee Dashboard</h1>
+  <div id="appointments"></div>
 
-<script>
-const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcXztfhCUIK4ju9zk4wMrLhEdkj72R0PGfnlsGDfbJ29BgC9fuQVmtoqt0eHo7Jk5nVjNzmKZe6M4H/pub?output=csv";
+  <script>
+    const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcXztfhCUIK4ju9zk4wMrLhEdkj72R0PGfnlsGDfbJ29BgC9fuQVmtoqt0eHo7Jk5nVjNzmKZe6M4H/pub?output=csv";
 
-fetch(sheetURL)
-  .then(response => response.text())
-  .then(csv => {
-    const rows = csv.split("\n").slice(1); // Skip the header row
-    const container = document.getElementById("appointments");
+    fetch(sheetURL)
+      .then(response => response.text())
+      .then(csv => {
+        const rows = csv.split("\n").slice(1); // skip header row
+        const container = document.getElementById("appointments");
 
-    rows.forEach(row => {
-      if (!row.trim()) return; // Skip empty rows
+        rows.forEach(row => {
+          if (!row.trim()) return;
+          const cols = row.split(",");
 
-      const cols = row.split(",");
+          const name = cols[1];
+          const phone = cols[2];
+          const service = cols[3];
+          const time = cols[4];
+          const hairstyle = cols[5]; // assuming a column for hairstyle
+          const imageURL = cols[6];  // assuming a column for an image URL
 
-      // Adjust indexes to match your CSV columns
-      const name = cols[1];      // Customer name
-      const phone = cols[2];     // Phone number
-      const hairstyle = cols[3]; // Hairstyle text
-      const imageURL = cols[4];  // Optional: image link
-      const time = cols[5];      // Scheduled time
+          const card = document.createElement("div");
+          card.className = "card";
 
-      const card = document.createElement("div");
-      card.style.border = "1px solid #ccc";
-      card.style.padding = "12px";
-      card.style.marginBottom = "10px";
-      card.style.borderRadius = "8px";
-      card.style.background = "#f9f9f9";
+          card.innerHTML = `
+            <strong>${name}</strong><br>
+            📞 ${phone}<br>
+            💈 ${service}<br>
+            ⏰ ${time}<br>
+            🖌 Hairstyle: ${hairstyle || "N/A"}<br>
+            ${imageURL ? `<img src="${imageURL}" alt="Hairstyle Image">` : ""}
+            <button class="complete">Complete</button>
+            <button class="pending">Pending</button>
+            <button class="cancel">Cancel</button>
+          `;
 
-      card.innerHTML = `
-        <strong>${name}</strong><br>
-        📞 ${phone}<br>
-        💈 Hairstyle: ${hairstyle}<br>
-        ${imageURL ? `<img src="${imageURL}" alt="Hairstyle" style="max-width:100px; display:block; margin:5px 0;">` : ''}
-        ⏰ ${time}<br><br>
-        <button class="complete">Complete</button>
-        <button class="pending">Pending</button>
-        <button class="cancel">Cancel</button>
-      `;
+          card.querySelector(".complete").onclick = () => card.style.background = "#d1fae5";
+          card.querySelector(".pending").onclick = () => card.style.background = "#fef3c7";
+          card.querySelector(".cancel").onclick = () => card.style.background = "#fee2e2";
 
-      // Status buttons
-      card.querySelector(".complete").onclick = () => { card.style.background = "#d1fae5"; };
-      card.querySelector(".pending").onclick = () => { card.style.background = "#fef3c7"; };
-      card.querySelector(".cancel").onclick = () => { card.style.background = "#fee2e2"; };
-
-      container.appendChild(card);
-    });
-  })
-  .catch(err => console.error("Error fetching CSV:", err));
-</script>
+          container.appendChild(card);
+        });
+      });
+  </script>
+</body>
+</html>
